@@ -25,5 +25,3 @@ def ping():
     return "Pinging Model!!"
 
 
-
-
