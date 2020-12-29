@@ -1,13 +1,29 @@
-from flask import Flask
+import pickle
+from flask import Flask, request, jsonify
+from model_files.ml_model import predict_mpg
 
 #creating a flask app and naming it "app"
-app = Flask('app')
+app = Flask('mpg_prediction')
 
-#Creating a route and a function that corresponds to it that will return "Pinging Model Application!!"
-@app.route('/test', methods=['GET'])
-def test():
-    return 'Pinging Model Application!!'
+@app.route('/predict', methods=['POST'])
+def predict():
+    vehicle = request.get_json()
+    print(vehicle)
+    with open('./model_files/model.bin', 'rb') as f_in:
+        model = pickle.load(f_in)
+        f_in.close()
+    predictions = predict_mpg(vehicle, model)
 
-if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=9696)
+    result = {
+        'mpg_prediction': list(predictions)
+    }
+    return jsonify(result)
+
+
+@app.route('/ping', methods=['GET'])
+def ping():
+    return "Pinging Model!!"
+
+
+
 
